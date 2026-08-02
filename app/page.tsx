@@ -1,4 +1,5 @@
 import { RefreshButton } from "@/app/refresh-button";
+import { auth, signOut } from "@/auth";
 import { readNews } from "@/lib/store";
 import type { NewsItem, NewsSource } from "@/lib/types";
 import Link from "next/link";
@@ -66,6 +67,7 @@ function NewsCard({ item, rank }: { item: NewsItem; rank: number }) {
 }
 
 export default async function Home() {
+  const session = await auth();
   const data = await readNews();
   const items = data?.items ?? [];
   const sourceCounts = Object.fromEntries(
@@ -87,23 +89,30 @@ export default async function Home() {
             </span>
             <span>Signal Desk</span>
           </Link>
-          <div className="live-status">
-            <span className="live-status__dot" aria-hidden="true" />
-            30 分钟刷新周期
+          <div className="briefing-header__utilities">
+            <div className="live-status">
+              <span className="live-status__dot" aria-hidden="true" />
+              30 分钟刷新周期
+            </div>
+            {session?.user && (
+              <div className="account-control">
+                <span title={session.user.email ?? undefined}>
+                  {session.user.email}
+                </span>
+                <form
+                  action={async () => {
+                    "use server";
+                    await signOut({ redirectTo: "/login" });
+                  }}
+                >
+                  <button type="submit">退出</button>
+                </form>
+              </div>
+            )}
           </div>
         </div>
 
         <div className="briefing-header__main">
-          <div>
-            <p className="eyebrow">AI INDUSTRY BRIEFING / 人工智能情报简报</p>
-            <h1>
-              把噪声留在外面。
-              <span>只看正在改变 AI 的信号。</span>
-            </h1>
-            <p className="briefing-header__intro">
-              聚合新闻、社区讨论与最新论文，并用中文提炼它们为何值得关注。
-            </p>
-          </div>
           <div className="briefing-header__actions">
             <RefreshButton />
             <p>

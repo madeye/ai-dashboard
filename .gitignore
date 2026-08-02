@@ -37,6 +37,9 @@ yarn-error.log*
 # runtime generated news data
 /data/
 
+# deploy target config (local only)
+/deploy.conf
+
 # vercel
 .vercel
 

@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
 import { runPipeline } from "@/lib/pipeline";
 import { readNews } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
 
 export async function POST() {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
   try {
     const result = await runPipeline();
     const data = await readNews();

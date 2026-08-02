@@ -1,0 +1,3 @@
+DEPLOY_SSH=user@example.com
+DEPLOY_DIR=/opt/ai-dashboard
+DEPLOY_SERVICE=ai-dashboard.service
