@@ -6,7 +6,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # AI News Dashboard（AI 新闻聚合站）
 
-AI 相关新闻聚合站：从 Google News、Reddit、Hacker News、arXiv、TechCrunch、The Verge、MIT Technology Review、Hugging Face Blog、Lobsters 与 Product Hunt 抓取热点，使用 OpenAI 兼容 API（默认 DeepSeek）为每条新闻生成中文洞察（insight），每 30 分钟自动刷新一次。整站需要登录访问（Google OAuth + 邮箱白名单）。
+AI 相关新闻聚合站：从 Google News、Reddit、Hacker News、arXiv、TechCrunch、The Verge、MIT Technology Review、Hugging Face Blog、Lobsters 与 Product Hunt 抓取热点，使用 OpenAI 兼容 API（默认 DeepSeek）为每条新闻生成中文洞察（insight），每 30 分钟自动刷新一次。首页 `/` 为公开静态快照页（ISR，可 CDN 缓存），无需登录即可浏览；登录（Google OAuth + 邮箱白名单）后可手动刷新与访问原始数据接口。
 
 ## 技术栈
 
@@ -47,13 +47,15 @@ npx tsx scripts/fetch-news.ts   # 手动跑一次抓取管线（会先尝试加�
 
 ### Web 层（`app/`）
 
-- `app/page.tsx` — 首页，服务端组件（`force-dynamic`），直接读 `data/news.json` 渲染新闻卡片列表。页面文案为中文。
+- `app/dashboard.tsx` — 新闻看板的纯展示组件（`Dashboard`）；通过 `controls` / `actions` 插槽注入登录态相关 UI。
+- `app/page.tsx` — 首页，即公开快照页（无需登录）：ISR 静态页（`revalidate = 300`），读 `data/news.json` 渲染 `Dashboard`，响应带 `s-maxage`，可由 CDN 按静态页面缓存。cron 写入的新快照最多延迟约 5 分钟可见；手动刷新由 `/api/refresh` 调 `revalidatePath("/")` 立即生效（`revalidatePath` 只能在 Route Handler / Server Function 中调用，node-cron 回调里不能调）。页面文案为中文。
+- `app/account-controls.tsx` — 客户端组件（`AccountControl` / `RefreshControl`）：首页是静态页，登录态只能在客户端通过 `/api/auth/session` 判断；匿名渲染登录入口（与 CDN 缓存的 HTML 一致），登录后切换为刷新按钮与账号栏（含 `next-auth/react` 的 `signOut`）。
 - `app/refresh-button.tsx` — 客户端组件，POST `/api/refresh` 后 `router.refresh()`。
-- `app/login/page.tsx` — 登录页（唯一公开路径）。
+- `app/login/page.tsx` — 登录页。
 - `app/api/auth/[...nextauth]/route.ts` — Auth.js handler。
-- `app/api/refresh/route.ts` — `POST` 手动触发管线（需登录），返回 502 表示抓取失败但旧快照已保留。
+- `app/api/refresh/route.ts` — `POST` 手动触发管线（需登录），成功后 `revalidatePath("/")`；返回 502 表示抓取失败但旧快照已保留。
 - `app/api/news/route.ts` — `GET` 返回原始 JSON 快照（需登录）。
-- `proxy.ts` — 路由守卫（Next.js 16 中取代 `middleware.ts` 的文件约定）：未登录用户一律重定向到 `/login`，API 路径返回 401 JSON。
+- `proxy.ts` — 路由守卫（Next.js 16 中取代 `middleware.ts` 的文件约定）：页面全部公开，未登录只拦截 API（返回 401 JSON；matcher 已排除 `/api/auth`）。CDN 缓存策略：`/` 为静态 ISR（`s-maxage=300`）可缓存；登录态差异由客户端组件处理，CDN 上的 HTML 对所有人相同，不存在缓存串号问题。
 - `auth.ts`（仓库根）— Auth.js 配置：Google provider、`signIn` 回调中检查邮箱白名单。
 - `instrumentation.ts` — 启动时注册 node-cron（`*/30 * * * *`），无缓存数据时立即抓取一次。仅 `nodejs` runtime 生效。
 

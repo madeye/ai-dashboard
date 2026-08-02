@@ -1,28 +1,17 @@
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
-const PUBLIC_PATHS = ["/login"];
-
 export default auth((request) => {
   const { pathname } = request.nextUrl;
 
   if (request.auth) return NextResponse.next();
-  if (
-    PUBLIC_PATHS.some(
-      (publicPath) =>
-        pathname === publicPath || pathname.startsWith(`${publicPath}/`)
-    )
-  ) {
-    return NextResponse.next();
-  }
 
+  // 页面（/ 静态快照、/login）全部公开；未登录只拦截 API。
   if (pathname.startsWith("/api/")) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const loginUrl = new URL("/login", request.nextUrl);
-  loginUrl.searchParams.set("callbackUrl", pathname + request.nextUrl.search);
-  return NextResponse.redirect(loginUrl);
+  return NextResponse.next();
 });
 
 export const config = {
