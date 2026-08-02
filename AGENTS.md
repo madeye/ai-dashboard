@@ -6,7 +6,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # AI News Dashboard（AI 新闻聚合站）
 
-AI 相关新闻聚合站：从 Google News、Reddit、Hacker News、arXiv、TechCrunch、The Verge、MIT Technology Review、Hugging Face Blog、Lobsters 与 Product Hunt 抓取热点，使用 OpenAI 兼容 API（默认 DeepSeek）为每条新闻生成中文洞察（insight），每 30 分钟自动刷新一次。首页 `/` 为公开静态快照页（ISR，可 CDN 缓存），无需登录即可浏览；登录（Google OAuth + 邮箱白名单）后可手动刷新与访问原始数据接口。
+AI 相关新闻聚合站：从 Google News、Reddit、Hacker News、arXiv、TechCrunch、The Verge、MIT Technology Review、Hugging Face Blog、Lobsters、Product Hunt，以及中文媒体（36氪、InfoQ 中文、极客公园）、日语媒体（ITmedia AI+、Publickey、gihyo.jp）、韩语媒体（AI타임스）抓取热点，使用 OpenAI 兼容 API（默认 DeepSeek）为每条新闻生成中文洞察（insight），每 30 分钟自动刷新一次。首页 `/` 为公开静态快照页（ISR，可 CDN 缓存），无需登录即可浏览；登录（Google OAuth + 邮箱白名单）后可手动刷新与访问原始数据接口。
 
 ## 技术栈
 
@@ -37,8 +37,8 @@ npx tsx scripts/fetch-news.ts   # 手动跑一次抓取管线（会先尝试加�
 
 ### 抓取管线（`lib/`）
 
-- `lib/pipeline.ts` — 核心管线：并行抓取最多 10 个数据源（`Promise.allSettled`）→ 失败或空结果的源复用上一份快照中该源的条目（记入 `staleSources`）→ `selectNewsItems` 去重、按来源保留最低代表性（每源至少 2 条）并取 top 40 → 仅为新增条目调用 LLM 生成中文 insight（旧条目按 id 复用缓存，不重复调用；并发上限 4）→ 原子写入 `data/news.json`（先写 `.tmp` 再 rename）。`runPipeline()` 有进程内单飞（single-flight）保护。`product-hunt` 仅在配置了 `PRODUCTHUNT_API_TOKEN` 时才会注册。
-- `lib/sources/` — 每个数据源一个文件：`google-news.ts`（RSS 搜索）、`reddit.ts`（Atom feed，需自定义 User-Agent；`.json` API 未认证会被 403）、`hacker-news.ts`（Algolia search API，一次请求一个关键词）、`arxiv.ts`（Atom API 而非 RSS，因为 RSS 周末为空）、`techcrunch.ts` / `the-verge.ts` / `mit-tech-review.ts` / `huggingface.ts` / `lobsters.ts`（单 feed RSS）、`product-hunt.ts`（v2 GraphQL API，需 developer token）。所有 fetch 函数失败时返回部分结果而不抛出。
+- `lib/pipeline.ts` — 核心管线：并行抓取最多 17 个数据源（`Promise.allSettled`）→ 失败或空结果的源复用上一份快照中该源的条目（记入 `staleSources`）→ `selectNewsItems` 去重、按来源保留最低代表性（每源至少 2 条）并取 top 50 → 仅为新增条目调用 LLM 生成中文 insight（旧条目按 id 复用缓存，不重复调用；并发上限 4）→ 原子写入 `data/news.json`（先写 `.tmp` 再 rename）。`runPipeline()` 有进程内单飞（single-flight）保护。`product-hunt` 仅在配置了 `PRODUCTHUNT_API_TOKEN` 时才会注册。
+- `lib/sources/` — 每个数据源一个文件：`google-news.ts`（RSS 搜索）、`reddit.ts`（Atom feed，需自定义 User-Agent；`.json` API 未认证会被 403）、`hacker-news.ts`（Algolia search API，一次请求一个关键词）、`arxiv.ts`（Atom API 而非 RSS，因为 RSS 周末为空）、`techcrunch.ts` / `the-verge.ts` / `mit-tech-review.ts` / `huggingface.ts` / `lobsters.ts`（单 feed RSS）、`product-hunt.ts`（v2 GraphQL API，需 developer token）、`36kr.ts` / `infoq-cn.ts` / `geekpark.ts`（中文媒体 RSS）、`itmedia-ai.ts` / `gihyo.ts`（日语媒体 RSS）、`publickey.ts`（日语 Atom）、`aitimes.ts`（韩语媒体 RSS）。中日韩综合媒体的条目需经 `ai-filter.ts` 按标题关键词过滤，只保留 AI 相关内容（勿加入摘要匹配，正文偶发提及 AI 会导致误报）。所有 fetch 函数失败时返回部分结果而不抛出。
 - `lib/ranking.ts` — 去重（按 id）+ 按时间排序 + 每源最低配额选择逻辑。
 - `lib/llm.ts` — 生成中文 insight（system prompt 要求：①一句话要点 ②一句话意义，共 ≤80 字）。未配置 `OPENAI_API_KEY` 或调用失败时降级为截断的原文摘要，不抛错。
 - `lib/store.ts` — `data/news.json` 读写；读取失败返回 `null`。
@@ -65,7 +65,7 @@ npx tsx scripts/fetch-news.ts   # 手动跑一次抓取管线（会先尝试加�
 
 ## 测试
 
-- 测试文件放在被测模块旁边，命名 `*.test.ts`（现有 `lib/ranking.test.ts`、`lib/auth-allowlist.test.ts`、`lib/sources/product-hunt.test.ts`）。
+- 测试文件放在被测模块旁边，命名 `*.test.ts`（现有 `lib/ranking.test.ts`、`lib/auth-allowlist.test.ts`、`lib/sources/product-hunt.test.ts`、`lib/sources/ai-filter.test.ts`）。
 - 使用 Node 内置 test runner（`node:test` + `node:assert/strict`），通过 `npm test`（`tsx --test lib/*.test.ts lib/sources/*.test.ts`）运行。注意 glob 只匹配 `lib/` 与 `lib/sources/` 一层，在其他目录新增测试需要同步更新该命令。
 
 ## 代码约定

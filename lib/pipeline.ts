@@ -8,12 +8,19 @@ import { fetchMitTechReview } from "@/lib/sources/mit-tech-review";
 import { fetchHuggingFace } from "@/lib/sources/huggingface";
 import { fetchLobsters } from "@/lib/sources/lobsters";
 import { fetchProductHunt } from "@/lib/sources/product-hunt";
+import { fetchKr36 } from "@/lib/sources/36kr";
+import { fetchInfoQcn } from "@/lib/sources/infoq-cn";
+import { fetchGeekpark } from "@/lib/sources/geekpark";
+import { fetchItmediaAi } from "@/lib/sources/itmedia-ai";
+import { fetchPublickey } from "@/lib/sources/publickey";
+import { fetchGihyo } from "@/lib/sources/gihyo";
+import { fetchAiTimes } from "@/lib/sources/aitimes";
 import { generateInsight } from "@/lib/llm";
 import { selectNewsItems } from "@/lib/ranking";
 import { readNews, writeNews } from "@/lib/store";
 import type { NewsItem, NewsSource, PipelineResult } from "@/lib/types";
 
-const MAX_ITEMS = 40;
+const MAX_ITEMS = 50;
 const MIN_ITEMS_PER_SOURCE = 2;
 const LLM_CONCURRENCY = 4;
 
@@ -30,6 +37,13 @@ const SOURCES: ReadonlyArray<{
   { id: "mit-tech-review", fetch: fetchMitTechReview },
   { id: "huggingface", fetch: fetchHuggingFace },
   { id: "lobsters", fetch: fetchLobsters },
+  { id: "36kr", fetch: fetchKr36 },
+  { id: "infoq-cn", fetch: fetchInfoQcn },
+  { id: "geekpark", fetch: fetchGeekpark },
+  { id: "itmedia-ai", fetch: fetchItmediaAi },
+  { id: "publickey", fetch: fetchPublickey },
+  { id: "gihyo", fetch: fetchGihyo },
+  { id: "aitimes", fetch: fetchAiTimes },
   // Product Hunt requires a developer token; skip the source entirely when
   // it is not configured so it isn't marked stale on every run.
   ...(process.env.PRODUCTHUNT_API_TOKEN
