@@ -20,13 +20,14 @@ npm run dev
 - 手动拉取一次数据：`npx tsx scripts/fetch-news.ts`
 - 手动触发刷新：登录后点击“刷新情报”（`POST /api/refresh` 需要有效会话）
 - 查看原始数据：登录后访问 `GET /api/news`
+- 首页 `/` 无需登录即可浏览（ISR 静态页，`revalidate = 300`，可被 CDN 按静态页面缓存）；登录入口在页面右上角与头部操作区
 
 ## 工作原理
 
 - `lib/sources/` — 数据源（Google News RSS、Reddit Atom、Hacker News Algolia API、arXiv Atom API）
 - `lib/pipeline.ts` — 并行抓取 → 失败源复用上一份快照 → 去重并保留各来源的基本代表性 → 取 top 30 → 为新增条目生成中文 insight（旧条目复用缓存，不重复调用 LLM）→ 原子写入 `data/news.json`
 - `instrumentation.ts` — Next.js 启动时注册 `node-cron`（`*/30 * * * *`），无缓存数据时立即执行一次
-- `app/page.tsx` — 服务端组件，直接读取 `data/news.json` 渲染
+- `app/page.tsx` — 首页即公开快照页：ISR 静态渲染 `data/news.json`（组件在 `app/dashboard.tsx`），登录态控件由 `app/account-controls.tsx` 在客户端按会话渲染
 
 ## 环境变量（.env，已 gitignore）
 
