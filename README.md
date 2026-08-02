@@ -5,16 +5,21 @@ AI 相关新闻聚合站：从 Google News、Reddit、Hacker News 与 arXiv 抓�
 ## 快速开始
 
 ```bash
-cp .env.example .env   # 填入 OPENAI_API_KEY（可选，缺省时展示原文摘要）
+cp .env.example .env
+# 填入 Google OAuth 配置与 ALLOWED_USERS；OPENAI_API_KEY 可选
 npm install
 npm run dev
 ```
 
 打开 http://localhost:3000。
 
+首次配置 Google Cloud OAuth 2.0 Web 客户端时，将
+`http://localhost:3000/api/auth/callback/google` 加入 Authorized redirect URIs。
+登录白名单支持用逗号或空格分隔多个邮箱；空白名单会拒绝所有账号。
+
 - 手动拉取一次数据：`npx tsx scripts/fetch-news.ts`
-- 手动触发刷新：`curl -X POST http://localhost:3000/api/refresh`
-- 查看原始数据：`GET /api/news`
+- 手动触发刷新：登录后点击“刷新情报”（`POST /api/refresh` 需要有效会话）
+- 查看原始数据：登录后访问 `GET /api/news`
 
 ## 工作原理
 
@@ -27,6 +32,11 @@ npm run dev
 
 | 变量 | 说明 | 默认值 |
 | --- | --- | --- |
+| `AUTH_SECRET` | Auth.js 会话签名密钥（`openssl rand -base64 32`） | 必填 |
+| `AUTH_GOOGLE_ID` | Google OAuth 客户端 ID | 必填 |
+| `AUTH_GOOGLE_SECRET` | Google OAuth 客户端密钥 | 必填 |
+| `ALLOWED_USERS` | 允许登录的 Google 邮箱列表 | 空（拒绝所有账号） |
+| `AUTH_URL` | 站点完整外部 URL（生产环境反代后必填，如 `https://news.maxlv.net`） | 本地开发可空 |
 | `OPENAI_API_KEY` | OpenAI 兼容 API key | 空（降级为原文摘要） |
 | `OPENAI_BASE_URL` | API base URL | `https://api.deepseek.com` |
 | `MODEL_NAME` | 模型 ID | `deepseek-chat` |
