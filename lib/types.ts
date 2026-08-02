@@ -2,7 +2,13 @@ export type NewsSource =
   | "google-news"
   | "reddit"
   | "hacker-news"
-  | "arxiv";
+  | "arxiv"
+  | "techcrunch"
+  | "the-verge"
+  | "mit-tech-review"
+  | "huggingface"
+  | "lobsters"
+  | "product-hunt";
 
 export interface NewsItem {
   /** Stable id derived from the URL */

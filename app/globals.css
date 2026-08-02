@@ -12,6 +12,8 @@
   --coral: #e65f4b;
   --amber: #c78319;
   --violet: #7452a6;
+  --mint: #3a8f6f;
+  --rose: #b04a68;
   --body-font: "Avenir Next", Avenir, "Helvetica Neue", "PingFang SC",
     "Microsoft YaHei", sans-serif;
   --display-font: "Arial Narrow", "Avenir Next Condensed", "PingFang SC",
@@ -440,6 +442,30 @@ button:focus-visible {
   color: var(--violet);
 }
 
+.source-pulse__lane--techcrunch .source-pulse__marker {
+  color: var(--mint);
+}
+
+.source-pulse__lane--the-verge .source-pulse__marker {
+  color: var(--rose);
+}
+
+.source-pulse__lane--mit-tech-review .source-pulse__marker {
+  color: var(--violet);
+}
+
+.source-pulse__lane--huggingface .source-pulse__marker {
+  color: var(--amber);
+}
+
+.source-pulse__lane--lobsters .source-pulse__marker {
+  color: var(--cyan);
+}
+
+.source-pulse__lane--product-hunt .source-pulse__marker {
+  color: var(--coral);
+}
+
 .feed {
   padding: 82px 0 40px;
 }
@@ -496,6 +522,30 @@ button:focus-visible {
 
 .news-card--arxiv {
   --source-color: var(--violet);
+}
+
+.news-card--techcrunch {
+  --source-color: var(--mint);
+}
+
+.news-card--the-verge {
+  --source-color: var(--rose);
+}
+
+.news-card--mit-tech-review {
+  --source-color: var(--violet);
+}
+
+.news-card--huggingface {
+  --source-color: var(--amber);
+}
+
+.news-card--lobsters {
+  --source-color: var(--cyan);
+}
+
+.news-card--product-hunt {
+  --source-color: var(--coral);
 }
 
 .news-card__rank {

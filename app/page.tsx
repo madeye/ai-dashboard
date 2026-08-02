@@ -14,6 +14,12 @@ const SOURCE_META: Record<
   reddit: { label: "Reddit", shortLabel: "Reddit", marker: "R" },
   "hacker-news": { label: "Hacker News", shortLabel: "HN", marker: "Y" },
   arxiv: { label: "arXiv", shortLabel: "Papers", marker: "A" },
+  techcrunch: { label: "TechCrunch", shortLabel: "TC", marker: "T" },
+  "the-verge": { label: "The Verge", shortLabel: "Verge", marker: "V" },
+  "mit-tech-review": { label: "MIT Tech Review", shortLabel: "MIT", marker: "M" },
+  huggingface: { label: "Hugging Face", shortLabel: "HF", marker: "H" },
+  lobsters: { label: "Lobsters", shortLabel: "Lob", marker: "L" },
+  "product-hunt": { label: "Product Hunt", shortLabel: "PH", marker: "P" },
 };
 
 const SOURCES = Object.keys(SOURCE_META) as NewsSource[];
@@ -173,7 +179,7 @@ export default async function Home() {
 
       <footer className="dashboard-footer">
         <span>AI SIGNAL DESK</span>
-        <span>Google News · Reddit · Hacker News · arXiv</span>
+        <span>Google News · Reddit · Hacker News · arXiv · TechCrunch · The Verge · MIT TR · Hugging Face · Lobsters · Product Hunt</span>
       </footer>
     </main>
   );
