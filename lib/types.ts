@@ -8,7 +8,14 @@ export type NewsSource =
   | "mit-tech-review"
   | "huggingface"
   | "lobsters"
-  | "product-hunt";
+  | "product-hunt"
+  | "36kr"
+  | "infoq-cn"
+  | "geekpark"
+  | "itmedia-ai"
+  | "publickey"
+  | "gihyo"
+  | "aitimes";
 
 export interface NewsItem {
   /** Stable id derived from the URL */

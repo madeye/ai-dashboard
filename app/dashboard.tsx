@@ -16,6 +16,13 @@ const SOURCE_META: Record<
   huggingface: { label: "Hugging Face", shortLabel: "HF", marker: "H" },
   lobsters: { label: "Lobsters", shortLabel: "Lob", marker: "L" },
   "product-hunt": { label: "Product Hunt", shortLabel: "PH", marker: "P" },
+  "36kr": { label: "36氪", shortLabel: "36氪", marker: "氪" },
+  "infoq-cn": { label: "InfoQ 中文", shortLabel: "InfoQ", marker: "Q" },
+  geekpark: { label: "极客公园", shortLabel: "极客公园", marker: "极" },
+  "itmedia-ai": { label: "ITmedia AI+", shortLabel: "ITmedia", marker: "I" },
+  publickey: { label: "Publickey", shortLabel: "Publickey", marker: "K" },
+  gihyo: { label: "gihyo.jp", shortLabel: "gihyo", marker: "技" },
+  aitimes: { label: "AI타임스", shortLabel: "AI Times", marker: "시" },
 };
 
 const SOURCES = Object.keys(SOURCE_META) as NewsSource[];
@@ -171,7 +178,7 @@ export function Dashboard({
 
       <footer className="dashboard-footer">
         <span>AI SIGNAL DESK</span>
-        <span>Google News · Reddit · Hacker News · arXiv · TechCrunch · The Verge · MIT TR · Hugging Face · Lobsters · Product Hunt</span>
+        <span>Google News · Reddit · Hacker News · arXiv · TechCrunch · The Verge · MIT TR · Hugging Face · Lobsters · Product Hunt · 36氪 · InfoQ 中文 · 极客公园 · ITmedia AI+ · Publickey · gihyo.jp · AI타임스</span>
       </footer>
     </main>
   );
