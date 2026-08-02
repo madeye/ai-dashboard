@@ -2,13 +2,19 @@ import { fetchGoogleNews } from "@/lib/sources/google-news";
 import { fetchReddit } from "@/lib/sources/reddit";
 import { fetchArxiv } from "@/lib/sources/arxiv";
 import { fetchHackerNews } from "@/lib/sources/hacker-news";
+import { fetchTechCrunch } from "@/lib/sources/techcrunch";
+import { fetchTheVerge } from "@/lib/sources/the-verge";
+import { fetchMitTechReview } from "@/lib/sources/mit-tech-review";
+import { fetchHuggingFace } from "@/lib/sources/huggingface";
+import { fetchLobsters } from "@/lib/sources/lobsters";
+import { fetchProductHunt } from "@/lib/sources/product-hunt";
 import { generateInsight } from "@/lib/llm";
 import { selectNewsItems } from "@/lib/ranking";
 import { readNews, writeNews } from "@/lib/store";
 import type { NewsItem, NewsSource, PipelineResult } from "@/lib/types";
 
-const MAX_ITEMS = 30;
-const MIN_ITEMS_PER_SOURCE = 3;
+const MAX_ITEMS = 40;
+const MIN_ITEMS_PER_SOURCE = 2;
 const LLM_CONCURRENCY = 4;
 
 const SOURCES: ReadonlyArray<{
@@ -19,6 +25,16 @@ const SOURCES: ReadonlyArray<{
   { id: "reddit", fetch: fetchReddit },
   { id: "hacker-news", fetch: fetchHackerNews },
   { id: "arxiv", fetch: fetchArxiv },
+  { id: "techcrunch", fetch: fetchTechCrunch },
+  { id: "the-verge", fetch: fetchTheVerge },
+  { id: "mit-tech-review", fetch: fetchMitTechReview },
+  { id: "huggingface", fetch: fetchHuggingFace },
+  { id: "lobsters", fetch: fetchLobsters },
+  // Product Hunt requires a developer token; skip the source entirely when
+  // it is not configured so it isn't marked stale on every run.
+  ...(process.env.PRODUCTHUNT_API_TOKEN
+    ? [{ id: "product-hunt" as NewsSource, fetch: fetchProductHunt }]
+    : []),
 ];
 
 let running: Promise<PipelineResult> | null = null;
