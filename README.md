@@ -1,6 +1,6 @@
 # AI News Dashboard
 
-AI 相关新闻聚合站：从 Google News、Reddit、Hacker News、arXiv 等英文源，以及 36氪、InfoQ 中文、极客公园（中文）、ITmedia AI+、Publickey、gihyo.jp（日语）、AI타임스（韩语）等媒体抓取热点，使用 OpenAI 兼容 API（默认 DeepSeek）生成中文洞察，每 30 分钟自动刷新。
+AI 相关新闻聚合站：从 Google News、Reddit、Hacker News、arXiv 等英文源，以及 36氪、极客公园（中文）、ITmedia AI+、Publickey、gihyo.jp（日语）、AI타임스（韩语）等媒体抓取热点，使用 OpenAI 兼容 API（默认 DeepSeek）生成中文洞察，每 30 分钟自动刷新。
 
 ## 快速开始
 

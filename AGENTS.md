@@ -6,7 +6,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # AI News Dashboard（AI 新闻聚合站）
 
-AI 相关新闻聚合站：从 Google News、Reddit、Hacker News、arXiv、TechCrunch、The Verge、MIT Technology Review、Hugging Face Blog、Lobsters、Product Hunt，以及中文媒体（36氪、InfoQ 中文、极客公园）、日语媒体（ITmedia AI+、Publickey、gihyo.jp）、韩语媒体（AI타임스）抓取热点，使用 OpenAI 兼容 API（默认 DeepSeek）为每条新闻生成中文洞察（insight），每 30 分钟自动刷新一次。首页 `/` 为公开静态快照页（ISR，可 CDN 缓存），无需登录即可浏览；登录（Google OAuth + 邮箱白名单）后可手动刷新与访问原始数据接口。
+AI 相关新闻聚合站：从 Google News、Reddit、Hacker News、arXiv、TechCrunch、The Verge、MIT Technology Review、Hugging Face Blog、Lobsters、Product Hunt，以及中文媒体（36氪、极客公园）、日语媒体（ITmedia AI+、Publickey、gihyo.jp）、韩语媒体（AI타임스）抓取热点，使用 OpenAI 兼容 API（默认 DeepSeek）为每条新闻生成中文洞察（insight），每 30 分钟自动刷新一次。首页 `/` 为公开静态快照页（ISR，可 CDN 缓存），无需登录即可浏览；登录（Google OAuth + 邮箱白名单）后可手动刷新与访问原始数据接口。
 
 ## 技术栈
 
@@ -37,8 +37,8 @@ npx tsx scripts/fetch-news.ts   # 手动跑一次抓取管线（会先尝试加�
 
 ### 抓取管线（`lib/`）
 
-- `lib/pipeline.ts` — 核心管线：并行抓取最多 17 个数据源（`Promise.allSettled`）→ 失败或空结果的源复用上一份快照中该源的条目（记入 `staleSources`）→ `selectNewsItems` 去重、按来源保留最低代表性（每源至少 2 条）并取 top 50 → 仅为新增条目调用 LLM 生成中文 insight（旧条目按 id 复用缓存，不重复调用；并发上限 4）→ 原子写入 `data/news.json`（先写 `.tmp` 再 rename）。`runPipeline()` 有进程内单飞（single-flight）保护。`product-hunt` 仅在配置了 `PRODUCTHUNT_API_TOKEN` 时才会注册。
-- `lib/sources/` — 每个数据源一个文件：`google-news.ts`（RSS 搜索）、`reddit.ts`（Atom feed，需自定义 User-Agent；`.json` API 未认证会被 403）、`hacker-news.ts`（Algolia search API，一次请求一个关键词）、`arxiv.ts`（Atom API 而非 RSS，因为 RSS 周末为空）、`techcrunch.ts` / `the-verge.ts` / `mit-tech-review.ts` / `huggingface.ts` / `lobsters.ts`（单 feed RSS）、`product-hunt.ts`（v2 GraphQL API，需 developer token）、`36kr.ts` / `infoq-cn.ts` / `geekpark.ts`（中文媒体 RSS）、`itmedia-ai.ts` / `gihyo.ts`（日语媒体 RSS）、`publickey.ts`（日语 Atom）、`aitimes.ts`（韩语媒体 RSS）。中日韩综合媒体的条目需经 `ai-filter.ts` 按标题关键词过滤，只保留 AI 相关内容（勿加入摘要匹配，正文偶发提及 AI 会导致误报）。所有 fetch 函数失败时返回部分结果而不抛出。
+- `lib/pipeline.ts` — 核心管线：并行抓取最多 16 个数据源（`Promise.allSettled`）→ 失败或空结果的源复用上一份快照中该源的条目（记入 `staleSources`）→ `selectNewsItems` 去重、按来源保留最低代表性（每源至少 2 条）并取 top 50 → 仅为新增条目调用 LLM 生成中文 insight（旧条目按 id 复用缓存，不重复调用；并发上限 4）→ 原子写入 `data/news.json`（先写 `.tmp` 再 rename）。`runPipeline()` 有进程内单飞（single-flight）保护。`product-hunt` 仅在配置了 `PRODUCTHUNT_API_TOKEN` 时才会注册。
+- `lib/sources/` — 每个数据源一个文件：`google-news.ts`（RSS 搜索）、`reddit.ts`（Atom feed，需自定义 User-Agent；`.json` API 未认证会被 403）、`hacker-news.ts`（Algolia search API，一次请求一个关键词）、`arxiv.ts`（Atom API 而非 RSS，因为 RSS 周末为空）、`techcrunch.ts` / `the-verge.ts` / `mit-tech-review.ts` / `huggingface.ts` / `lobsters.ts`（单 feed RSS）、`product-hunt.ts`（v2 GraphQL API，需 developer token）、`36kr.ts` / `geekpark.ts`（中文媒体 RSS）、`itmedia-ai.ts` / `gihyo.ts`（日语媒体 RSS）、`publickey.ts`（日语 Atom）、`aitimes.ts`（韩语媒体 RSS）。中日韩综合媒体的条目需经 `ai-filter.ts` 按标题关键词过滤，只保留 AI 相关内容（勿加入摘要匹配，正文偶发提及 AI 会导致误报）。所有 fetch 函数失败时返回部分结果而不抛出。
 - `lib/ranking.ts` — 去重（按 id）+ 按时间排序 + 每源最低配额选择逻辑。
 - `lib/llm.ts` — 生成中文 insight（system prompt 要求：①一句话要点 ②一句话意义，共 ≤80 字）。未配置 `OPENAI_API_KEY` 或调用失败时降级为截断的原文摘要，不抛错。
 - `lib/store.ts` — `data/news.json` 读写；读取失败返回 `null`。
@@ -47,7 +47,7 @@ npx tsx scripts/fetch-news.ts   # 手动跑一次抓取管线（会先尝试加�
 
 ### Web 层（`app/`）
 
-- `app/dashboard.tsx` — 新闻看板的纯展示组件（`Dashboard`）；通过 `controls` / `actions` 插槽注入登录态相关 UI。
+- `app/dashboard.tsx` — 新闻看板组件（`Dashboard`，客户端组件）：点击顶部来源条可按来源过滤新闻（再次点击取消，选中态高亮，无条目来源禁用）；通过 `controls` / `actions` 插槽注入登录态相关 UI。
 - `app/page.tsx` — 首页，即公开快照页（无需登录）：ISR 静态页（`revalidate = 300`），读 `data/news.json` 渲染 `Dashboard`，响应带 `s-maxage`，可由 CDN 按静态页面缓存。cron 写入的新快照最多延迟约 5 分钟可见；手动刷新由 `/api/refresh` 调 `revalidatePath("/")` 立即生效（`revalidatePath` 只能在 Route Handler / Server Function 中调用，node-cron 回调里不能调）。页面文案为中文。
 - `app/account-controls.tsx` — 客户端组件（`AccountControl` / `RefreshControl`）：首页是静态页，登录态只能在客户端通过 `/api/auth/session` 判断；匿名渲染登录入口（与 CDN 缓存的 HTML 一致），登录后切换为刷新按钮与账号栏（含 `next-auth/react` 的 `signOut`）。
 - `app/refresh-button.tsx` — 客户端组件，POST `/api/refresh` 后 `router.refresh()`。
