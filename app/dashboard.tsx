@@ -1,6 +1,8 @@
+"use client";
+
 import type { NewsData, NewsItem, NewsSource } from "@/lib/types";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 const SOURCE_META: Record<
   NewsSource,
@@ -17,7 +19,6 @@ const SOURCE_META: Record<
   lobsters: { label: "Lobsters", shortLabel: "Lob", marker: "L" },
   "product-hunt": { label: "Product Hunt", shortLabel: "PH", marker: "P" },
   "36kr": { label: "36氪", shortLabel: "36氪", marker: "氪" },
-  "infoq-cn": { label: "InfoQ 中文", shortLabel: "InfoQ", marker: "Q" },
   geekpark: { label: "极客公园", shortLabel: "极客公园", marker: "极" },
   "itmedia-ai": { label: "ITmedia AI+", shortLabel: "ITmedia", marker: "I" },
   publickey: { label: "Publickey", shortLabel: "Publickey", marker: "K" },
@@ -40,7 +41,12 @@ function timeAgo(iso: string): string {
 }
 
 function NewsCard({ item, rank }: { item: NewsItem; rank: number }) {
-  const source = SOURCE_META[item.source];
+  // 旧快照可能包含已下线的来源，兜底展示原始 source 名
+  const source = SOURCE_META[item.source] ?? {
+    label: item.source,
+    shortLabel: item.source,
+    marker: "?",
+  };
 
   return (
     <article className={`news-card news-card--${item.source}`}>
@@ -76,7 +82,7 @@ function NewsCard({ item, rank }: { item: NewsItem; rank: number }) {
 }
 
 /**
- * 新闻看板的纯展示部分，首页（登录态，动态）与 /snapshot（匿名，静态）共用。
+ * 新闻看板（客户端组件）：点击来源条可按来源过滤新闻，再次点击取消过滤。
  * controls: 右上角账号区；actions: 刷新按钮区。
  */
 export function Dashboard({
@@ -89,12 +95,17 @@ export function Dashboard({
   actions?: ReactNode;
 }) {
   const items = data?.items ?? [];
+  const [selectedSource, setSelectedSource] = useState<NewsSource | null>(null);
   const sourceCounts = Object.fromEntries(
     SOURCES.map((source) => [
       source,
       items.filter((item) => item.source === source).length,
     ])
   ) as Record<NewsSource, number>;
+  const ranked = items.map((item, index) => ({ item, rank: index + 1 }));
+  const visible = selectedSource
+    ? ranked.filter(({ item }) => item.source === selectedSource)
+    : ranked;
 
   return (
     <main className="dashboard-shell">
@@ -136,9 +147,20 @@ export function Dashboard({
 
         <div className="source-pulse" aria-label="当前快照的来源分布">
           {SOURCES.map((source) => (
-            <div
-              className={`source-pulse__lane source-pulse__lane--${source}`}
+            <button
+              type="button"
+              className={`source-pulse__lane source-pulse__lane--${source}${
+                selectedSource === source ? " source-pulse__lane--active" : ""
+              }`}
               key={source}
+              disabled={sourceCounts[source] === 0}
+              aria-pressed={selectedSource === source}
+              title={`仅显示 ${SOURCE_META[source].label}`}
+              onClick={() =>
+                setSelectedSource((current) =>
+                  current === source ? null : source
+                )
+              }
             >
               <div>
                 <span className="source-pulse__marker" aria-hidden="true">
@@ -147,7 +169,7 @@ export function Dashboard({
                 <span>{SOURCE_META[source].shortLabel}</span>
               </div>
               <strong>{String(sourceCounts[source]).padStart(2, "0")}</strong>
-            </div>
+            </button>
           ))}
         </div>
       </header>
@@ -158,7 +180,13 @@ export function Dashboard({
             <p className="eyebrow">LATEST SIGNALS</p>
             <h2 id="feed-title">最新情报</h2>
           </div>
-          <p>{items.length > 0 ? `${items.length} 条精选` : "等待首次采集"}</p>
+          <p>
+            {items.length > 0
+              ? selectedSource
+                ? `${SOURCE_META[selectedSource].label} ${visible.length} 条（点击来源条取消过滤）`
+                : `${items.length} 条精选`
+              : "等待首次采集"}
+          </p>
         </div>
 
         {items.length === 0 ? (
@@ -169,8 +197,8 @@ export function Dashboard({
           </div>
         ) : (
           <div className="news-list">
-            {items.map((item, index) => (
-              <NewsCard key={item.id} item={item} rank={index + 1} />
+            {visible.map(({ item, rank }) => (
+              <NewsCard key={item.id} item={item} rank={rank} />
             ))}
           </div>
         )}
@@ -178,7 +206,7 @@ export function Dashboard({
 
       <footer className="dashboard-footer">
         <span>AI SIGNAL DESK</span>
-        <span>Google News · Reddit · Hacker News · arXiv · TechCrunch · The Verge · MIT TR · Hugging Face · Lobsters · Product Hunt · 36氪 · InfoQ 中文 · 极客公园 · ITmedia AI+ · Publickey · gihyo.jp · AI타임스</span>
+        <span>Google News · Reddit · Hacker News · arXiv · TechCrunch · The Verge · MIT TR · Hugging Face · Lobsters · Product Hunt · 36氪 · 极客公园 · ITmedia AI+ · Publickey · gihyo.jp · AI타임스</span>
       </footer>
     </main>
   );

@@ -10,7 +10,6 @@ export type NewsSource =
   | "lobsters"
   | "product-hunt"
   | "36kr"
-  | "infoq-cn"
   | "geekpark"
   | "itmedia-ai"
   | "publickey"
