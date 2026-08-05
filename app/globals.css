@@ -493,28 +493,20 @@ button:focus-visible {
   color: var(--coral);
 }
 
-.source-pulse__lane--36kr .source-pulse__marker {
+.source-pulse__lane--semi-engineering .source-pulse__marker {
   color: var(--mint);
 }
 
-.source-pulse__lane--geekpark .source-pulse__marker {
+.source-pulse__lane--ee-times .source-pulse__marker {
   color: var(--violet);
 }
 
-.source-pulse__lane--itmedia-ai .source-pulse__marker {
+.source-pulse__lane--semiwiki .source-pulse__marker {
   color: var(--amber);
 }
 
-.source-pulse__lane--publickey .source-pulse__marker {
+.source-pulse__lane--ieee-spectrum .source-pulse__marker {
   color: var(--cyan);
-}
-
-.source-pulse__lane--gihyo .source-pulse__marker {
-  color: var(--coral);
-}
-
-.source-pulse__lane--aitimes .source-pulse__marker {
-  color: var(--mint);
 }
 
 .feed {
@@ -599,28 +591,20 @@ button:focus-visible {
   --source-color: var(--coral);
 }
 
-.news-card--36kr {
+.news-card--semi-engineering {
   --source-color: var(--mint);
 }
 
-.news-card--geekpark {
+.news-card--ee-times {
   --source-color: var(--violet);
 }
 
-.news-card--itmedia-ai {
+.news-card--semiwiki {
   --source-color: var(--amber);
 }
 
-.news-card--publickey {
+.news-card--ieee-spectrum {
   --source-color: var(--cyan);
-}
-
-.news-card--gihyo {
-  --source-color: var(--coral);
-}
-
-.news-card--aitimes {
-  --source-color: var(--mint);
 }
 
 .news-card__rank {

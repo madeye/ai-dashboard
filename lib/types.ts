@@ -9,12 +9,10 @@ export type NewsSource =
   | "huggingface"
   | "lobsters"
   | "product-hunt"
-  | "36kr"
-  | "geekpark"
-  | "itmedia-ai"
-  | "publickey"
-  | "gihyo"
-  | "aitimes";
+  | "semi-engineering"
+  | "ee-times"
+  | "semiwiki"
+  | "ieee-spectrum";
 
 export interface NewsItem {
   /** Stable id derived from the URL */
