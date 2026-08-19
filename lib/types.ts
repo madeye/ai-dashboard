@@ -12,7 +12,10 @@ export type NewsSource =
   | "semi-engineering"
   | "ee-times"
   | "semiwiki"
-  | "ieee-spectrum";
+  | "ieee-spectrum"
+  | "ft"
+  | "wsj"
+  | "economist";
 
 export interface NewsItem {
   /** Stable id derived from the URL */

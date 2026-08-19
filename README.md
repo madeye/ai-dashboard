@@ -1,6 +1,6 @@
 # AI News Dashboard
 
-AI 与半导体相关新闻聚合站：从 Google News、Reddit、Hacker News、arXiv、TechCrunch 等英文源，以及 Semiconductor Engineering、EE Times、SemiWiki、IEEE Spectrum（semiconductors 频道）等半导体媒体抓取热点，使用 OpenAI 兼容 API（默认 DeepSeek）生成中文洞察，每 30 分钟自动刷新。
+AI 与半导体相关新闻聚合站：从 Google News、Reddit、Hacker News、arXiv、TechCrunch、Financial Times、Wall Street Journal、The Economist 等英文源，以及 Semiconductor Engineering、EE Times、SemiWiki、IEEE Spectrum（semiconductors 频道）等半导体媒体抓取热点，使用 OpenAI 兼容 API（默认 DeepSeek）生成中文洞察，每 30 分钟自动刷新。
 
 ## 快速开始
 
@@ -24,7 +24,7 @@ npm run dev
 
 ## 工作原理
 
-- `lib/sources/` — 数据源（Google News RSS、Reddit Atom、Hacker News Algolia API、arXiv Atom API、Semiconductor Engineering / EE Times / SemiWiki / IEEE Spectrum 等半导体媒体 RSS）
+- `lib/sources/` — 数据源（Google News RSS、Reddit Atom、Hacker News Algolia API、arXiv Atom API、FT / WSJ / The Economist RSS、Semiconductor Engineering / EE Times / SemiWiki / IEEE Spectrum 等半导体媒体 RSS）
 - `lib/pipeline.ts` — 并行抓取 → 失败源复用上一份快照 → 去重并保留各来源的基本代表性 → 取 top 50 → 为新增条目生成中文 insight（旧条目复用缓存，不重复调用 LLM）→ 原子写入 `data/news.json`
 - `instrumentation.ts` — Next.js 启动时注册 `node-cron`（`*/30 * * * *`），无缓存数据时立即执行一次
 - `app/page.tsx` — 首页即公开快照页：ISR 静态渲染 `data/news.json`（组件在 `app/dashboard.tsx`），登录态控件由 `app/account-controls.tsx` 在客户端按会话渲染
