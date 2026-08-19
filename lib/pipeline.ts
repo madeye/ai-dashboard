@@ -12,6 +12,9 @@ import { fetchSemiEngineering } from "@/lib/sources/semi-engineering";
 import { fetchEeTimes } from "@/lib/sources/ee-times";
 import { fetchSemiwiki } from "@/lib/sources/semiwiki";
 import { fetchIeeeSpectrum } from "@/lib/sources/ieee-spectrum";
+import { fetchFt } from "@/lib/sources/ft";
+import { fetchWsj } from "@/lib/sources/wsj";
+import { fetchEconomist } from "@/lib/sources/economist";
 import { generateInsight } from "@/lib/llm";
 import { selectNewsItems } from "@/lib/ranking";
 import { readNews, writeNews } from "@/lib/store";
@@ -38,6 +41,9 @@ const SOURCES: ReadonlyArray<{
   { id: "ee-times", fetch: fetchEeTimes },
   { id: "semiwiki", fetch: fetchSemiwiki },
   { id: "ieee-spectrum", fetch: fetchIeeeSpectrum },
+  { id: "ft", fetch: fetchFt },
+  { id: "wsj", fetch: fetchWsj },
+  { id: "economist", fetch: fetchEconomist },
   // Product Hunt requires a developer token; skip the source entirely when
   // it is not configured so it isn't marked stale on every run.
   ...(process.env.PRODUCTHUNT_API_TOKEN

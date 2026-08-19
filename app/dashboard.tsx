@@ -22,6 +22,9 @@ const SOURCE_META: Record<
   "ee-times": { label: "EE Times", shortLabel: "EE Times", marker: "E" },
   semiwiki: { label: "SemiWiki", shortLabel: "SemiWiki", marker: "W" },
   "ieee-spectrum": { label: "IEEE Spectrum", shortLabel: "IEEE", marker: "I" },
+  ft: { label: "Financial Times", shortLabel: "FT", marker: "F" },
+  wsj: { label: "Wall Street Journal", shortLabel: "WSJ", marker: "J" },
+  economist: { label: "The Economist", shortLabel: "Econ", marker: "C" },
 };
 
 const SOURCES = Object.keys(SOURCE_META) as NewsSource[];
@@ -204,7 +207,7 @@ export function Dashboard({
 
       <footer className="dashboard-footer">
         <span>AI SIGNAL DESK</span>
-        <span>Google News · Reddit · Hacker News · arXiv · TechCrunch · The Verge · MIT TR · Hugging Face · Lobsters · Product Hunt · Semiconductor Engineering · EE Times · SemiWiki · IEEE Spectrum</span>
+        <span>Google News · Reddit · Hacker News · arXiv · TechCrunch · The Verge · MIT TR · Hugging Face · Lobsters · Product Hunt · Semiconductor Engineering · EE Times · SemiWiki · IEEE Spectrum · FT · WSJ · The Economist</span>
       </footer>
     </main>
   );

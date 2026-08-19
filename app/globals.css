@@ -509,6 +509,18 @@ button:focus-visible {
   color: var(--cyan);
 }
 
+.source-pulse__lane--ft .source-pulse__marker {
+  color: var(--rose);
+}
+
+.source-pulse__lane--wsj .source-pulse__marker {
+  color: var(--navy);
+}
+
+.source-pulse__lane--economist .source-pulse__marker {
+  color: var(--coral);
+}
+
 .feed {
   padding: 82px 0 40px;
 }
@@ -605,6 +617,18 @@ button:focus-visible {
 
 .news-card--ieee-spectrum {
   --source-color: var(--cyan);
+}
+
+.news-card--ft {
+  --source-color: var(--rose);
+}
+
+.news-card--wsj {
+  --source-color: var(--navy);
+}
+
+.news-card--economist {
+  --source-color: var(--coral);
 }
 
 .news-card__rank {
@@ -793,12 +817,8 @@ button:focus-visible {
     border-bottom: 1px solid var(--line);
   }
 
-  .source-pulse__lane:nth-child(2) {
+  .source-pulse__lane:nth-child(even) {
     border-right: 0;
-  }
-
-  .source-pulse__lane:nth-child(n + 3) {
-    border-bottom: 0;
   }
 
   .feed {
